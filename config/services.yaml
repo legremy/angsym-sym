@@ -23,5 +23,10 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
+    # creation of the JWT token
+    App\Event\JwtCreationListener:
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: injectDataIntoJwt }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

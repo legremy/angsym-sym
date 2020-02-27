@@ -1,0 +1,60 @@
+easy_admin:
+
+    user: 
+      name_property_path: 'username'
+      avatar_property_path: 'avatar'
+
+    design:
+      menu:
+        - { entity: "Utilisateurs", label: "Les utilisateurs", icon: "users" }
+        - label: "Comptabilité" 
+          children: 
+            - { entity: "Clients", label: "Les clients", icon: "suitcase" }
+            - { entity: "Factures", label: "Les factures", icon: "credit-card" }
+
+
+    formats:
+      date: "d/m/Y"
+      time: "H:i"
+      datetime: "d/m/Y H:i:s"
+    
+    entities:
+
+        Utilisateurs:
+          class: App\Entity\User
+          list:
+            title: "Liste des utilisateurs inscrits"
+            help: "Gérez vos utilisateurs"
+            fields:
+              - id
+              - { property: "avatar", label: "Avatar", type: "avatar", is_image_url: true }
+              - { property: "email", label: "Adresse email" }
+              - { property: "customers", label: "Nombre de clients" }
+            actions: 
+              - { name: "edit", label: false, icon: "pencil", css_class: "btn btn-primary" }
+              - { name: "delete", label: false, icon: "trash", css_class: "btn btn-danger" }
+        
+        Clients:
+          class: App\Entity\Customer
+        
+        Factures: 
+          class: App\Entity\Invoice
+          form: 
+            fields: 
+              - { property: "amount", label: "Montant", type: "money" }
+              - { property: "status", label: "Statut", type: "choice", type_options: {"choices": {Envoyée: "SENT", Payée: "PAID", Annulée: "CANCELLED"}} }
+              - { property: "customer", label: "Client" }
+              - { property: "sentAt", label: "Date d'envoi", type: "date", type_options: { widget: single_text} }
+          list:
+            title: "Liste des factures de vos utilisateurs"
+            fields: 
+              - id
+              - { property: "amount", label: "Montant" }
+              - { property: "status", label: "Statut", template: "admin/invoice_status.html.twig" }
+              - { property: "sentAt", label: "Date d'envoi" }
+              - { property: "customer", label: "Client concerné" }
+            actions: 
+              - { name: "edit", label: false, icon: "pencil", css_class: "btn btn-primary" }
+              - { name: "delete", label: false, icon: "trash", css_class: "btn btn-danger" }
+
+

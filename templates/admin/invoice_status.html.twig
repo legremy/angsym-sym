@@ -1,0 +1,11 @@
+{% if value=="PAID" %}
+    <span class="badge badge-success">Payée</span>
+
+{% elseif value=="SENT" %}
+
+    <span class="badge badge-secondary">Envoyée</span>
+{% else %}
+    <span class="badge badge-warning">Annulée</span>
+
+
+{% endif %}

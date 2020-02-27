@@ -6,12 +6,16 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
  * @ApiResource
+ * @UniqueEntity("email", message="Email déjà utilisé")
  */
 class User implements UserInterface
 {
@@ -26,6 +30,8 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      * @Groups({"customer:read", "invoice:read"})
+     * @Assert\NotBlank(message="Email obligatoire")
+     * @Assert\Email(message="Email invalide")
      */
     private $email;
 
@@ -37,12 +43,15 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Assert\NotBlank(message="Mot de passe obligatoire")
+     * @Assert\Length(min=8, minMessage="8 caractères")
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Groups({"customer:read", "invoice:read"})
+     * @Assert\Url(message="url invalide")
      */
     private $avatar;
 

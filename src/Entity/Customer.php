@@ -7,7 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
-
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(
@@ -28,18 +28,24 @@ class Customer
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customer:read", "invoice:read"})
+     * @Assert\NotBlank(message="Le prénom est obligatoire")
+     * @Assert\Length(min=3, minMessage="Le prénom doit faire 3 caractères au minimum")
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customer:read", "invoice:read"})
+     * @Assert\NotBlank(message="Le nom de famille est obligatoire")
+     * @Assert\Length(min=3, minMessage="Le nom de famille doit faire 3 caractères au minimum")
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"customer:read", "invoice:read"})
+     * @Assert\NotBlank(message="L'adresse email est obligatoire")
+     * @Assert\Email(message="Email non valide")
      */
     private $email;
 
@@ -132,6 +138,59 @@ class Customer
         return $this;
     }
 
+
+    /**
+     * @Groups({"customer:read"})
+     *
+     * @return float
+     */
+    public function getInvoicesCount(): float
+    {
+        return count($this->invoices);
+    }
+
+    /**
+     * @Groups({"customer:read"})
+     *
+     * @return float
+     */
+    public function getTotalAmount(): float
+    {
+        $total = 0;
+
+        foreach ($this->invoices as $invoice) {
+            $total += $invoice->getAmount();
+        }
+
+        return $total;
+    }
+
+    /**
+     * @Groups({"customer:read"})
+     *
+     * @return float
+     */
+    public function getPaidAmount(): float
+    {
+        $total = 0;
+        foreach ($this->invoices as $invoice) {
+            if ($invoice->getStatus() === "PAID") {
+                $total += $invoice->getAmount();
+            }
+        }
+        return $total;
+    }
+
+    /**
+     * @Groups({"customer:read"})
+     *
+     * @return float
+     */
+    public function getUnpaidAmount(): float
+    {
+        return $this->getTotalAmount() - $this->getPaidAmount();
+    }
+
     public function getUser(): ?User
     {
         return $this->user;
@@ -142,5 +201,10 @@ class Customer
         $this->user = $user;
 
         return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->firstName . " " . $this->lastName;
     }
 }
